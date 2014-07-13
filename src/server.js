@@ -4,6 +4,8 @@ var Express = require('express');
 var ExpressSession = require('express-session');
 var Passport = require('passport');
 var TwitterStrategy = require('passport-twitter').Strategy;
+//var User = require('./User');
+
 
 Nconf.argv().env().file({ file: 'settings-local.json' });
 
@@ -12,17 +14,26 @@ var TWITTER_CONSUMER_SECRET = Nconf.get('twitter_consumer_secret');
 
 var app = Express();
 
+
 app.use(ExpressSession({
 	secret: Nconf.get('session_secret'),
 	saveUninitialized: true,
 	resave: true
 }));
 
+app.use(Passport.initialize());
+app.use(Passport.session());
+
 var server = app.listen(3000, '127.0.0.1', 511, onServerListening);
 
 
 app.get('/', function(req, res) {
-	res.send('heeey <a href="/login">login</a>');
+	if(req.user) {
+		console.log('a user is logged in', req.user.name);
+		res.send('hey ' + req.user.name + ' <a href="/logout">logout</a>');
+	} else {
+		res.send('heeey <a href="/login">login</a>');
+	}
 });
 
 
@@ -33,22 +44,29 @@ function onServerListening() {
 }
 
 // The twitterama ~~~~
+
+var users = {}; // XXX FIXME use a proper database lol
+
+function findUser(uid, callback) {
+	var user = users[uid];
+	callback(false, user);
+}
+
 function setupTwitter() {
 
 	console.log('twitterarama!');
 
 	var addr = server.address();
 
-	// uhrrhghhg this is awful XXX FIXME
+	// uhrrhghhg this is awful XXX FIXME FIXALLTHETHINGS
 	var TWITTER_AUTH_PATH = '/auth/twitter';
 	var TWITTER_AUTH_CALLBACK_PATH = '/auth/twitter/callback';
 	var TWITTER_CALLBACK_URL = 'http://' + addr.address + ':' + addr.port + TWITTER_AUTH_CALLBACK_PATH;
 
+
 	app.get('/login', function(req, res) {
 		res.send('<a href="' + TWITTER_AUTH_PATH + '">login with twitter</a>');
 	});
-
-	console.log(TWITTER_CALLBACK_URL);
 
 	Passport.use(new TwitterStrategy({
 			consumerKey: TWITTER_CONSUMER_KEY,
@@ -56,11 +74,32 @@ function setupTwitter() {
 			callbackURL: TWITTER_CALLBACK_URL
 		},
 		function(token, tokenSecret, profile, done) {
+			console.log(token, tokenSecret, profile);
+			
 			//User.findOrCreate(..., function(err, user) {
 			//	if (err) { return done(err); }
 			//	done(null, user);
 			//});
-			console.log(token, tokenSecret, profile);
+			
+			if(profile) {
+				var user = {
+					id: profile.id,
+					name: profile.username,
+					fullname: profile.displayName
+				};
+
+				var uid = user.id;
+
+				// TODO create own id, don't rely on twitter's
+				if(!users[uid]) {
+					users[uid] = user;
+				}
+
+				done(null, user);
+			} else {
+				done(err);
+			}
+
 		}
 	));
 
@@ -73,5 +112,16 @@ function setupTwitter() {
 			failureRedirect: '/login'
 	}));
 
+	Passport.serializeUser(function(user, done) {
+		console.log('serialize user', user);
+		done(null, user.id);
+	});
+
+	Passport.deserializeUser(function(uid, done) {
+		console.log('deserialize user', uid);
+		findUser(uid, function (err, user) {
+			done(err, user);
+		});
+	});
 }
 
