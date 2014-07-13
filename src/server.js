@@ -2,6 +2,8 @@ var http = require('http');
 var Nconf = require('nconf');
 var Express = require('express');
 var ExpressSession = require('express-session');
+var ExpressMethodOverride = require('express-method-override');
+var CookieParser = require('cookie-parser');
 var Passport = require('passport');
 var TwitterStrategy = require('passport-twitter').Strategy;
 //var User = require('./User');
@@ -14,7 +16,8 @@ var TWITTER_CONSUMER_SECRET = Nconf.get('twitter_consumer_secret');
 
 var app = Express();
 
-
+app.use(CookieParser());
+app.use(ExpressMethodOverride());
 app.use(ExpressSession({
 	secret: Nconf.get('session_secret'),
 	saveUninitialized: true,
@@ -32,6 +35,7 @@ app.get('/', function(req, res) {
 		console.log('a user is logged in', req.user.name);
 		res.send('hey ' + req.user.name + ' <a href="/logout">logout</a>');
 	} else {
+		console.log('not logged');
 		res.send('heeey <a href="/login">login</a>');
 	}
 });
