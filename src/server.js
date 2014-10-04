@@ -1,13 +1,16 @@
 var nconf = require('nconf');
 var Hapi = require('hapi');
-var routeHandlers = require('./routeHandlers');
+
 var server = new Hapi.Server(3000);
 
 nconf.argv().env().file({ file: 'settings-local.json' });
 
+
+var routeHandlers = require('./routeHandlers')(nconf);
+
 var TWITTER_CONSUMER_KEY = nconf.get('twitter_consumer_key');
 var TWITTER_CONSUMER_SECRET = nconf.get('twitter_consumer_secret');
-var COOKIE_ENCRYPTION_PASSWORD = 'whaaaateveeer,changethis!!!';
+var COOKIE_ENCRYPTION_PASSWORD = nconf.get('cookie_encryption_password');
 var COOKIES_ARE_SECURE = false; // TODO change to true if using https in server proto
 
 
