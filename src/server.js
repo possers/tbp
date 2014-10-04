@@ -19,10 +19,14 @@ server.route({
 
 server.pack.register([
 		{ plugin: require('bell') },
-		// { plugin: require('hapi-auth-cookie') }
 		{
 			plugin: require('yar'),
-			options: { cookieOptions: { password: COOKIE_ENCRYPTION_PASSWORD } }
+			options: {
+				cookieOptions: {
+					password: COOKIE_ENCRYPTION_PASSWORD,
+					isSecure: COOKIES_ARE_SECURE
+				}
+			}
 		}
 	], 
 	function (err) {
@@ -51,3 +55,4 @@ server.pack.register([
 
 	}
 );
+
