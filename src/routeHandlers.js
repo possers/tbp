@@ -35,7 +35,8 @@ function index(request, reply) {
 	if(auth) {
 		reply('wow you are so authenticated! ' + auth.profile.username);
 	} else {
-		reply('hullo <a href="/login">login please</a>');
+		// reply('hullo <a href="/login">login please</a>');
+		reply.view('index');
 	}
 
 }

@@ -10,6 +10,7 @@
   "license": "MIT",
   "dependencies": {
     "bell": "^1.1.0",
+    "handlebars": "^2.0.0",
     "hapi": "^6.11.0",
     "nconf": "^0.6.9",
     "nodemon": "^1.2.1",
