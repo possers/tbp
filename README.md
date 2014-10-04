@@ -1,13 +1,15 @@
 ## functionality
 
-- login
-- write
-	- store locally
-	- send to server
-	- send to public server
-	- receive data + associate with priv copy
-- read
-	- paginate
+- [x] login
+- [ ] read
+	- [ ] render
+	- [ ] cache
+	- [ ] paginate
+- [ ] write
+	- [ ] store locally
+	- [ ] send to server
+	- [ ] send to public server
+	- [ ] receive data + associate with priv copy
 - messages
 - accounts?
 
