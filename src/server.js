@@ -29,11 +29,25 @@ var serverOptions = {
 
 var server = new Hapi.Server(3000, serverOptions);
 
-server.route({
-	method: ['GET'],
-	path: '/',
-	handler: routeHandlers.index
-});
+server.route([
+	{
+		method: ['GET'],
+		path: '/',
+		handler: routeHandlers.index
+	},
+	{
+		method: ['GET'],
+		path: '/js/{path*}',
+		handler: {
+			directory: {
+				path: './src/public/js',
+				listing: false,
+				index: false
+			}
+		}
+	},
+]);
+
 
 server.pack.register([
 		{ plugin: require('bell') },
