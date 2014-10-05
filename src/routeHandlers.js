@@ -34,10 +34,12 @@ function index(request, reply) {
 	var auth = request.session.get('authcredentials');
 
 	if(auth) {
-		reply('wow you are so authenticated! ' + auth.profile.username);
+		// TODO reply with more context variables and stuff so the app can actually work client side
+		reply.view('index', {
+			username: auth.profile.username
+		});
 	} else {
-		// reply('hullo <a href="/login">login please</a>');
-		reply.view('index');
+		reply.view('logged-out');
 	}
 
 }
