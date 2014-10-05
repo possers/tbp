@@ -26,7 +26,8 @@ function refreshtimeline(creds) {
 			return;
 		}
 		console.log(data);
-	});}
+	});
+}
 
 function index(request, reply) {
 
@@ -50,7 +51,7 @@ function login(request, reply) {
 	// TODO is this the best thing? advice gladly taken
 	request.session.set('authcredentials', request.auth.credentials);
 
-	refreshtimeline(request.auth.credentials);
+	// XXX refreshtimeline(request.auth.credentials);
 	
 	return reply.redirect('/');
 }
